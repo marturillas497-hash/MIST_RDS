@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-const router = useRouter();
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { YEAR_LEVELS } from "@/lib/constants";
@@ -15,7 +14,6 @@ function toUpperCase(str) {
 }
 
 export default function RegisterPage() {
-  const router = useRouter();
   const supabase = createClient();
 
   const [step, setStep] = useState(1);

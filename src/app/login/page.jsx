@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
-export default function LoginPage() {
-  const router = useRouter();
+function LoginForm() {
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -50,6 +49,89 @@ export default function LoginPage() {
   }
 
   return (
+    <div style={{ width: "100%", maxWidth: "22rem" }} className="animate-fade-up">
+      <div style={{ marginBottom: "2rem" }}>
+        <h2 style={{
+          fontFamily: "DM Serif Display, Georgia, serif",
+          fontSize: "1.75rem", color: "#0f172a",
+          marginBottom: "0.25rem", letterSpacing: "-0.02em",
+        }}>
+          Welcome back
+        </h2>
+        <p style={{ fontSize: "0.875rem", color: "#64748b" }}>
+          Sign in to your MIST-RDS account
+        </p>
+      </div>
+
+      <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <div>
+          <label className="label">Email address</label>
+          <input
+            type="email"
+            className="input"
+            placeholder="you@mist.edu.ph"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            autoComplete="email"
+          />
+        </div>
+
+        <div>
+          <label className="label">Password</label>
+          <input
+            type="password"
+            className="input"
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            autoComplete="current-password"
+          />
+        </div>
+
+        {success && (
+          <div style={{
+            backgroundColor: "#d1fae5", border: "1px solid #a7f3d0",
+            color: "#065f46", fontSize: "0.875rem",
+            padding: "0.75rem 1rem", borderRadius: "0.5rem",
+          }}>
+            {success}
+          </div>
+        )}
+
+        {error && (
+          <div style={{
+            backgroundColor: "#fee2e2", border: "1px solid #fecaca",
+            color: "#991b1b", fontSize: "0.875rem",
+            padding: "0.75rem 1rem", borderRadius: "0.5rem",
+          }}>
+            {error}
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="btn-secondary"
+          style={{ width: "100%", marginTop: "0.5rem" }}
+        >
+          {loading ? "Signing in..." : "Sign in"}
+        </button>
+      </form>
+
+      <p style={{ textAlign: "center", fontSize: "0.875rem", color: "#64748b", marginTop: "1.5rem" }}>
+        No account yet?{" "}
+        <Link href="/register" style={{ color: "#003366", fontWeight: "500" }}>
+          Register here
+        </Link>
+      </p>
+    </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
     <div style={{ minHeight: "100vh", backgroundColor: "#f8fafc", display: "flex" }}>
       {/* Left panel */}
       <div
@@ -66,11 +148,7 @@ export default function LoginPage() {
         className="hidden lg:flex"
       >
         {/* Background circles */}
-        <div
-          style={{
-            position: "absolute", inset: 0, opacity: 0.05, pointerEvents: "none",
-          }}
-        >
+        <div style={{ position: "absolute", inset: 0, opacity: 0.05, pointerEvents: "none" }}>
           <div style={{
             position: "absolute", top: 0, right: 0,
             width: "24rem", height: "24rem", borderRadius: "9999px",
@@ -136,84 +214,9 @@ export default function LoginPage() {
         flex: 1, display: "flex", alignItems: "center",
         justifyContent: "center", padding: "3rem 1.5rem",
       }}>
-        <div style={{ width: "100%", maxWidth: "22rem" }} className="animate-fade-up">
-          <div style={{ marginBottom: "2rem" }}>
-            <h2 style={{
-              fontFamily: "DM Serif Display, Georgia, serif",
-              fontSize: "1.75rem", color: "#0f172a",
-              marginBottom: "0.25rem", letterSpacing: "-0.02em",
-            }}>
-              Welcome back
-            </h2>
-            <p style={{ fontSize: "0.875rem", color: "#64748b" }}>
-              Sign in to your MIST-RDS account
-            </p>
-          </div>
-
-          <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-            <div>
-              <label className="label">Email address</label>
-              <input
-                type="email"
-                className="input"
-                placeholder="you@mist.edu.ph"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                autoComplete="email"
-              />
-            </div>
-
-            <div>
-              <label className="label">Password</label>
-              <input
-                type="password"
-                className="input"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                autoComplete="current-password"
-              />
-            </div>
-
-            {success && (
-              <div style={{
-                backgroundColor: "#d1fae5", border: "1px solid #a7f3d0",
-                color: "#065f46", fontSize: "0.875rem",
-                padding: "0.75rem 1rem", borderRadius: "0.5rem",
-              }}>
-                {success}
-              </div>
-            )}
-
-            {error && (
-              <div style={{
-                backgroundColor: "#fee2e2", border: "1px solid #fecaca",
-                color: "#991b1b", fontSize: "0.875rem",
-                padding: "0.75rem 1rem", borderRadius: "0.5rem",
-              }}>
-                {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-secondary"
-              style={{ width: "100%", marginTop: "0.5rem" }}
-            >
-              {loading ? "Signing in..." : "Sign in"}
-            </button>
-          </form>
-
-          <p style={{ textAlign: "center", fontSize: "0.875rem", color: "#64748b", marginTop: "1.5rem" }}>
-            No account yet?{" "}
-            <Link href="/register" style={{ color: "#003366", fontWeight: "500" }}>
-              Register here
-            </Link>
-          </p>
-        </div>
+        <Suspense fallback={null}>
+          <LoginForm />
+        </Suspense>
       </div>
     </div>
   );

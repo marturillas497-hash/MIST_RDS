@@ -125,7 +125,7 @@ function EditModal({ abstract, onClose, onSave }) {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="label">Authors</label>
               <input
@@ -155,11 +155,11 @@ function EditModal({ abstract, onClose, onSave }) {
           )}
         </div>
 
-        <div className="border-t border-slate-100 p-4 flex items-center justify-between">
+        <div className="border-t border-slate-100 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <p className="text-xs text-slate-400">
             Embedding will be regenerated on save.
           </p>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 justify-end">
             <button onClick={onClose} className="btn-ghost" disabled={saving}>
               Cancel
             </button>
@@ -273,7 +273,8 @@ export function LibraryClient({ isAdmin, profile, departments }) {
 
   return (
     <>
-      <form onSubmit={handleSearchSubmit} className="flex gap-3 mb-6">
+      {/* Search bar — stacks on mobile */}
+      <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-2 mb-6">
         <input
           type="text"
           className="input flex-1"
@@ -282,7 +283,7 @@ export function LibraryClient({ isAdmin, profile, departments }) {
           onChange={(e) => setQuery(e.target.value)}
         />
         <select
-          className="input w-52"
+          className="input sm:w-44"
           value={deptFilter}
           onChange={(e) => setDeptFilter(e.target.value)}
         >
@@ -293,7 +294,7 @@ export function LibraryClient({ isAdmin, profile, departments }) {
             </option>
           ))}
         </select>
-        <button type="submit" className="btn-secondary px-5" disabled={searching}>
+        <button type="submit" className="btn-secondary sm:px-5" disabled={searching}>
           {searching ? "..." : "Search"}
         </button>
       </form>

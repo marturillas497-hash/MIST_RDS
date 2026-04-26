@@ -45,7 +45,7 @@ export default async function AdminPage() {
         />
 
         {/* Stats */}
-        <div className="grid grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <StatCard label="Registered Students" value={studentCount || 0} icon="◎" />
           <StatCard label="Library Abstracts" value={abstractCount || 0} icon="◫" />
           <StatCard
@@ -65,14 +65,14 @@ export default async function AdminPage() {
               <Link
                 key={action.href}
                 href={action.href}
-                className={`card-hover p-5 flex items-center gap-4 ${
+                className={`card-hover p-4 md:p-5 flex items-center gap-3 md:gap-4 ${
                   action.highlight ? "border-amber-300 bg-amber-50" : ""
                 }`}
               >
-                <span className={`text-2xl ${action.highlight ? "text-amber-500" : "text-slate-400"}`}>
+                <span className={`text-xl md:text-2xl flex-shrink-0 ${action.highlight ? "text-amber-500" : "text-slate-400"}`}>
                   {action.icon}
                 </span>
-                <div>
+                <div className="min-w-0">
                   <p className="text-sm font-semibold text-slate-900">{action.label}</p>
                   <p className={`text-xs mt-0.5 ${action.highlight ? "text-amber-700 font-medium" : "text-slate-500"}`}>
                     {action.desc}
@@ -94,9 +94,9 @@ export default async function AdminPage() {
                 <Link
                   key={report.id}
                   href={`/dashboard/report/${report.id}`}
-                  className="flex items-center justify-between px-5 py-4 hover:bg-slate-50 transition-colors group"
+                  className="flex items-center justify-between px-4 md:px-5 py-4 hover:bg-slate-50 transition-colors group"
                 >
-                  <div className="flex-1 min-w-0 pr-4">
+                  <div className="flex-1 min-w-0 pr-3">
                     <p className="text-sm font-medium text-slate-800 truncate group-hover:text-navy-600 transition-colors">
                       {report.input_title}
                     </p>
@@ -107,7 +107,7 @@ export default async function AdminPage() {
                       })}
                     </p>
                   </div>
-                  <div className="flex items-center gap-3 flex-shrink-0">
+                  <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
                     <span className="text-xs font-bold text-slate-600">
                       {Math.round(report.similarity_score * 100)}%
                     </span>

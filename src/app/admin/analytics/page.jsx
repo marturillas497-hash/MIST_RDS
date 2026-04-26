@@ -1,8 +1,8 @@
+import Link from "next/link";
 import { requireAdmin } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { AdminSidebar } from "@/components/shared/Sidebar";
 import { PageShell, PageHeader } from "@/components/shared/PageShell";
-import { StatCard } from "@/components/ui/StatCard";
 
 export default async function AnalyticsPage() {
   const profile = await requireAdmin();
@@ -13,7 +13,6 @@ export default async function AnalyticsPage() {
   const [
     { count: totalViews },
     { count: weekViews },
-    { count: uniqueAbstracts },
     { data: recentHistory },
   ] = await Promise.all([
     adminClient.from("abstract_views").select("id", { count: "exact", head: true }),
@@ -23,15 +22,11 @@ export default async function AnalyticsPage() {
       .gte("viewed_at", oneWeekAgo),
     adminClient
       .from("abstract_views")
-      .select("abstract_id", { count: "exact", head: true }),
-    adminClient
-      .from("abstract_views")
       .select("viewed_at, profiles(full_name, student_metadata(id_number)), abstracts(title)")
       .order("viewed_at", { ascending: false })
       .limit(50),
   ]);
 
-  // Top 10 all time
   const { data: allViews } = await adminClient
     .from("abstract_views")
     .select("abstract_id, abstracts(title, accession_id, departments(code))");
@@ -55,7 +50,6 @@ export default async function AnalyticsPage() {
     .sort((a, b) => b.count - a.count)
     .slice(0, 10);
 
-  // Top 5 this week
   const { data: weekViewed } = await adminClient
     .from("abstract_views")
     .select("abstract_id, abstracts(title, accession_id, departments(code))")
@@ -84,21 +78,41 @@ export default async function AnalyticsPage() {
     <div className="flex">
       <AdminSidebar profile={profile} />
       <PageShell>
+        <Link href="/admin" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 transition-colors mb-4">
+          ← Back to dashboard
+        </Link>
+
         <PageHeader
           title="Library Analytics"
           subtitle="Abstract view counts, trending research, and student activity."
         />
 
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
-          <StatCard label="Total Abstract Views" value={totalViews || 0} icon="◳" />
-          <StatCard label="Views This Week" value={weekViews || 0} icon="◫" sub="Last 7 days" />
-          <StatCard label="Unique Abstracts Viewed" value={uniqueAbstracts || 0} icon="◎" />
+        {/* Stats — compact horizontal cards */}
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          <div className="card p-4 flex items-center gap-4">
+            <span className="text-2xl opacity-50">◳</span>
+            <div>
+              <p className="text-2xl font-bold font-serif text-slate-900 leading-none">
+                {totalViews || 0}
+              </p>
+              <p className="text-sm text-slate-500 mt-1">Total Abstract Views</p>
+            </div>
+          </div>
+          <div className="card p-4 flex items-center gap-4">
+            <span className="text-2xl opacity-50">◫</span>
+            <div>
+              <p className="text-2xl font-bold font-serif text-slate-900 leading-none">
+                {weekViews || 0}
+              </p>
+              <p className="text-sm text-slate-500 mt-1">Views This Week</p>
+              <p className="text-xs text-slate-400">Last 7 days</p>
+            </div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-6 mb-8">
-          {/* Top 10 all time */}
-          <div className="col-span-2">
+        {/* Charts */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="md:col-span-2">
             <h2 className="font-serif text-lg text-slate-800 mb-4">
               Top 10 Most Viewed (All Time)
             </h2>
@@ -109,7 +123,7 @@ export default async function AnalyticsPage() {
             ) : (
               <div className="card divide-y divide-slate-100">
                 {topAllTime.map((item, i) => (
-                  <div key={item.abstract_id} className="flex items-center gap-4 px-5 py-3">
+                  <div key={item.abstract_id} className="flex items-center gap-4 px-4 md:px-5 py-3">
                     <span className="text-xs font-bold text-slate-300 w-5 text-right flex-shrink-0">
                       {i + 1}
                     </span>
@@ -132,7 +146,7 @@ export default async function AnalyticsPage() {
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
                       <div
-                        className="h-1.5 bg-navy-200 rounded-full"
+                        className="h-1.5 bg-navy-200 rounded-full hidden sm:block"
                         style={{
                           width: `${Math.max(24, (item.count / (topAllTime[0]?.count || 1)) * 80)}px`,
                         }}
@@ -147,7 +161,6 @@ export default async function AnalyticsPage() {
             )}
           </div>
 
-          {/* Trending this week */}
           <div>
             <h2 className="font-serif text-lg text-slate-800 mb-4">Trending This Week</h2>
             {topWeek.length === 0 ? (
@@ -160,7 +173,7 @@ export default async function AnalyticsPage() {
                   <div key={item.abstract_id} className="px-4 py-3">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-[10px] text-slate-400 font-bold">#{i + 1}</span>
-                      <span className="text-xs font-bold text-gold-600">
+                      <span className="text-xs font-bold text-yellow-600">
                         {item.count} view{item.count !== 1 ? "s" : ""}
                       </span>
                     </div>
@@ -192,22 +205,14 @@ export default async function AnalyticsPage() {
               No view history yet.
             </div>
           ) : (
-            <div className="card overflow-hidden">
-              <table className="w-full text-sm">
+            <div className="card overflow-x-auto">
+              <table className="w-full text-sm min-w-[600px]">
                 <thead>
                   <tr className="bg-slate-50 border-b border-slate-100">
-                    <th className="text-left text-xs font-semibold text-slate-500 px-5 py-3">
-                      Timestamp
-                    </th>
-                    <th className="text-left text-xs font-semibold text-slate-500 px-5 py-3">
-                      Student
-                    </th>
-                    <th className="text-left text-xs font-semibold text-slate-500 px-5 py-3">
-                      Student ID
-                    </th>
-                    <th className="text-left text-xs font-semibold text-slate-500 px-5 py-3">
-                      Abstract Viewed
-                    </th>
+                    <th className="text-left text-xs font-semibold text-slate-500 px-5 py-3">Timestamp</th>
+                    <th className="text-left text-xs font-semibold text-slate-500 px-5 py-3">Student</th>
+                    <th className="text-left text-xs font-semibold text-slate-500 px-5 py-3">Student ID</th>
+                    <th className="text-left text-xs font-semibold text-slate-500 px-5 py-3">Abstract Viewed</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">

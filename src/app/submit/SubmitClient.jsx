@@ -114,7 +114,8 @@ export default function SubmitPage({ profile }) {
                   required
                 />
                 <p className="text-xs text-slate-400 mt-1.5">
-                  {description.length} characters {description.length < 50 && description.length > 0 && "— at least 50 required"}
+                  {description.length} characters{" "}
+                  {description.length < 50 && description.length > 0 && "— at least 50 required"}
                 </p>
               </div>
             </div>
@@ -180,11 +181,11 @@ export default function SubmitPage({ profile }) {
             )}
 
             {!isLoading && (
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <p className="text-xs text-slate-400">
                   The embedding model runs in your browser. First load may take a moment.
                 </p>
-                <button type="submit" className="btn-primary">
+                <button type="submit" className="btn-primary w-full sm:w-auto">
                   Run Semantic Scan →
                 </button>
               </div>

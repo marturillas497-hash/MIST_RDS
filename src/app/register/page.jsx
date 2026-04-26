@@ -142,70 +142,61 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md animate-fade-up">
+
+        {/* Logo */}
         <div className="flex items-center gap-3 mb-8">
-          <div
-            className="w-9 h-9 rounded-lg flex items-center justify-center"
-            style={{ backgroundColor: "#003366" }}
-          >
-            <span style={{ color: "#ffcc00", fontFamily: "serif", fontSize: "1rem", fontWeight: "bold" }}>
-              M
-            </span>
+          <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-[#003366]">
+            <span className="font-serif font-bold text-base text-[#ffcc00]">M</span>
           </div>
           <div>
-            <p style={{ fontSize: "0.75rem", fontWeight: "700", color: "#002a52", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+            <p className="text-[0.75rem] font-bold text-[#002a52] tracking-[0.1em] uppercase">
               MIST-RDS
             </p>
-            <p style={{ fontSize: "0.625rem", color: "#94a3b8" }}>Research Discovery System</p>
+            <p className="text-[0.625rem] text-slate-400">Research Discovery System</p>
           </div>
         </div>
 
-        <div className="card p-8">
+        <div className="card p-6 sm:p-8">
+
+          {/* Step indicator */}
           <div className="flex items-center gap-2 mb-6">
             {[1, 2].map((s) => (
               <div key={s} className="flex items-center gap-2">
                 <div
+                  className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-200"
                   style={{
-                    width: "1.5rem",
-                    height: "1.5rem",
-                    borderRadius: "9999px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "0.75rem",
-                    fontWeight: "700",
                     backgroundColor: s <= step ? "#003366" : "#f1f5f9",
                     color: s <= step ? "#ffffff" : "#94a3b8",
-                    transition: "all 0.2s",
                   }}
                 >
                   {s}
                 </div>
                 {s < 2 && (
                   <div
-                    style={{
-                      width: "2rem",
-                      height: "2px",
-                      backgroundColor: s < step ? "#003366" : "#e2e8f0",
-                    }}
+                    className="w-8 h-0.5 transition-colors duration-200"
+                    style={{ backgroundColor: s < step ? "#003366" : "#e2e8f0" }}
                   />
                 )}
               </div>
             ))}
-            <span style={{ marginLeft: "0.5rem", fontSize: "0.75rem", color: "#64748b" }}>
+            <span className="ml-2 text-xs text-slate-500">
               {step === 1 ? "Account details" : "Academic profile"}
             </span>
           </div>
 
-          <h2 className="font-serif" style={{ fontSize: "1.5rem", color: "#0f172a", marginBottom: "0.25rem" }}>
+          {/* Heading */}
+          <h2 className="font-serif text-2xl text-slate-900 mb-1">
             {step === 1 ? "Create your account" : "Your academic profile"}
           </h2>
-          <p style={{ fontSize: "0.875rem", color: "#64748b", marginBottom: "1.5rem" }}>
+          <p className="text-sm text-slate-500 mb-6">
             {step === 1
               ? "Join MIST-RDS to validate your research proposals."
               : "Tell us about your academic background."}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+
+            {/* Step 1 */}
             {step === 1 && (
               <>
                 <div>
@@ -214,25 +205,29 @@ export default function RegisterPage() {
                     type="text"
                     className="input"
                     placeholder="Juan Dela Cruz"
+                    autoComplete="name"
                     value={form.full_name}
                     onChange={(e) => update("full_name", toTitleCase(e.target.value))}
                     required
                   />
                 </div>
+
                 <div>
                   <label className="label">Email address</label>
                   <input
                     type="email"
                     className="input"
                     placeholder="you@mist.edu.ph"
+                    autoComplete="email"
                     value={form.email}
                     onChange={(e) => update("email", e.target.value)}
                     required
                   />
                 </div>
+
                 <div>
                   <label className="label">I am registering as</label>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
+                  <div className="grid grid-cols-2 gap-2">
                     {[
                       { value: "student", label: "Student" },
                       { value: "research_adviser", label: "Research Adviser" },
@@ -241,16 +236,11 @@ export default function RegisterPage() {
                         key={opt.value}
                         type="button"
                         onClick={() => update("role", opt.value)}
+                        className="px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer"
                         style={{
-                          padding: "0.625rem 1rem",
-                          borderRadius: "0.5rem",
-                          fontSize: "0.875rem",
-                          fontWeight: "500",
                           border: `1px solid ${form.role === opt.value ? "#003366" : "#e2e8f0"}`,
                           backgroundColor: form.role === opt.value ? "#003366" : "#ffffff",
                           color: form.role === opt.value ? "#ffffff" : "#475569",
-                          transition: "all 0.2s",
-                          cursor: "pointer",
                         }}
                       >
                         {opt.label}
@@ -258,32 +248,32 @@ export default function RegisterPage() {
                     ))}
                   </div>
                   {form.role === "research_adviser" && (
-                    <p style={{
-                      fontSize: "0.75rem", color: "#92400e", marginTop: "0.5rem",
-                      backgroundColor: "#fef3c7", border: "1px solid #fde68a",
-                      padding: "0.5rem 0.75rem", borderRadius: "0.5rem",
-                    }}>
+                    <p className="text-xs text-amber-800 mt-2 bg-amber-50 border border-amber-200 px-3 py-2 rounded-lg">
                       Adviser accounts require admin approval before you can log in.
                     </p>
                   )}
                 </div>
+
                 <div>
                   <label className="label">Password</label>
                   <input
                     type="password"
                     className="input"
                     placeholder="Min. 8 characters"
+                    autoComplete="new-password"
                     value={form.password}
                     onChange={(e) => update("password", e.target.value)}
                     required
                   />
                 </div>
+
                 <div>
                   <label className="label">Confirm password</label>
                   <input
                     type="password"
                     className="input"
                     placeholder="Repeat your password"
+                    autoComplete="new-password"
                     value={form.confirmPassword}
                     onChange={(e) => update("confirmPassword", e.target.value)}
                     required
@@ -292,11 +282,12 @@ export default function RegisterPage() {
               </>
             )}
 
+            {/* Step 2 */}
             {step === 2 && (
               <>
                 <div>
                   <label className="label">
-                    Department <span style={{ color: "#ef4444" }}>*</span>
+                    Department <span className="text-red-500">*</span>
                   </label>
                   <select
                     className="input"
@@ -317,7 +308,7 @@ export default function RegisterPage() {
                   <>
                     <div>
                       <label className="label">
-                        Student ID <span style={{ color: "#ef4444" }}>*</span>
+                        Student ID <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
@@ -328,10 +319,11 @@ export default function RegisterPage() {
                         required
                       />
                     </div>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
                         <label className="label">
-                          Year level <span style={{ color: "#ef4444" }}>*</span>
+                          Year level <span className="text-red-500">*</span>
                         </label>
                         <select
                           className="input"
@@ -347,7 +339,7 @@ export default function RegisterPage() {
                       </div>
                       <div>
                         <label className="label">
-                          Section <span style={{ color: "#ef4444" }}>*</span>
+                          Section <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="text"
@@ -359,10 +351,11 @@ export default function RegisterPage() {
                         />
                       </div>
                     </div>
+
                     <div>
                       <label className="label">
                         Research Adviser{" "}
-                        <span style={{ fontSize: "0.75rem", color: "#94a3b8" }}>(optional)</span>
+                        <span className="text-xs text-slate-400">(optional)</span>
                       </label>
                       <select
                         className="input"
@@ -382,23 +375,20 @@ export default function RegisterPage() {
               </>
             )}
 
+            {/* Error */}
             {error && (
-              <div style={{
-                backgroundColor: "#fee2e2", border: "1px solid #fecaca",
-                color: "#991b1b", fontSize: "0.875rem",
-                padding: "0.75rem 1rem", borderRadius: "0.5rem",
-              }}>
+              <div className="bg-red-50 border border-red-200 text-red-800 text-sm px-4 py-3 rounded-lg">
                 {error}
               </div>
             )}
 
+            {/* Actions */}
             <div className="flex gap-3 pt-2">
               {step === 2 && (
                 <button
                   type="button"
                   onClick={() => { setStep(1); setError(""); }}
-                  className="btn-ghost"
-                  style={{ flex: 1 }}
+                  className="btn-ghost flex-1"
                 >
                   Back
                 </button>
@@ -406,8 +396,7 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="btn-secondary"
-                style={{ flex: 1 }}
+                className="btn-secondary flex-1"
               >
                 {loading
                   ? "Creating account..."
@@ -419,9 +408,9 @@ export default function RegisterPage() {
           </form>
         </div>
 
-        <p style={{ textAlign: "center", fontSize: "0.875rem", color: "#64748b", marginTop: "1rem" }}>
+        <p className="text-center text-sm text-slate-500 mt-4">
           Already have an account?{" "}
-          <Link href="/login" style={{ color: "#003366", fontWeight: "500" }}>
+          <Link href="/login" className="text-[#003366] font-medium">
             Sign in
           </Link>
         </p>

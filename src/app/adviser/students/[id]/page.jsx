@@ -11,7 +11,6 @@ export default async function StudentReportsPage({ params }) {
   const profile = await requireAdviser();
   const adminClient = createAdminClient();
 
-  // Verify this student is actually assigned to this adviser
   const { data: studentMeta } = await adminClient
     .from("student_metadata")
     .select("profile_id, id_number, year_level, section, adviser_id, profiles!student_metadata_profile_id_fkey(full_name, departments(code, name))")
@@ -38,11 +37,9 @@ export default async function StudentReportsPage({ params }) {
     <div className="flex">
       <AdviserSidebar profile={profile} />
       <PageShell>
-        <div className="mb-6">
-          <Link href="/adviser" className="text-sm text-slate-500 hover:text-navy-600 transition-colors">
-            ← Back to Students
-          </Link>
-        </div>
+        <Link href="/adviser" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 transition-colors mb-4">
+          ← Back to students
+        </Link>
 
         <PageHeader
           title={student.full_name}
@@ -50,7 +47,7 @@ export default async function StudentReportsPage({ params }) {
         />
 
         {/* Student info */}
-        <div className="card p-5 mb-6 flex items-center gap-6">
+        <div className="card p-5 mb-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
           {student.department && (
             <div>
               <p className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mb-1">Department</p>
@@ -73,7 +70,7 @@ export default async function StudentReportsPage({ params }) {
               </p>
             </div>
           )}
-          <div className="ml-auto">
+          <div>
             <p className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mb-1">Total Reports</p>
             <p className="text-sm font-bold text-slate-700">{reports?.length || 0}</p>
           </div>
@@ -93,9 +90,9 @@ export default async function StudentReportsPage({ params }) {
               <Link
                 key={report.id}
                 href={`/dashboard/report/${report.id}`}
-                className="flex items-center justify-between px-5 py-4 hover:bg-slate-50 transition-colors group"
+                className="flex items-center justify-between px-4 md:px-5 py-4 hover:bg-slate-50 transition-colors group"
               >
-                <div className="flex-1 min-w-0 pr-4">
+                <div className="flex-1 min-w-0 pr-3">
                   <p className="text-sm font-medium text-slate-800 truncate group-hover:text-navy-600 transition-colors">
                     {report.input_title}
                   </p>
@@ -109,7 +106,7 @@ export default async function StudentReportsPage({ params }) {
                     })}
                   </p>
                 </div>
-                <div className="flex items-center gap-3 flex-shrink-0">
+                <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
                   <span className="text-xs font-bold text-slate-600">
                     {Math.round(report.similarity_score * 100)}%
                   </span>

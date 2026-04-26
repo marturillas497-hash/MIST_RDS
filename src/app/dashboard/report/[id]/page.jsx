@@ -23,7 +23,6 @@ export default async function ReportPage({ params }) {
 
   if (!report) return notFound();
 
-  // Access control
   const canView =
     profile.role === "admin" ||
     (profile.role === "student" && report.student_id === profile.id) ||
@@ -59,11 +58,9 @@ export default async function ReportPage({ params }) {
     <div className="flex">
       <SidebarComponent profile={profile} />
       <PageShell>
-        <div className="mb-6">
-          <Link href={backHref} className="text-sm text-slate-500 hover:text-navy-600 transition-colors">
-            ← Back
-          </Link>
-        </div>
+        <Link href={backHref} className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 transition-colors mb-4">
+          ← Back
+        </Link>
 
         <PageHeader
           title="Similarity Report"
@@ -74,8 +71,8 @@ export default async function ReportPage({ params }) {
 
         {/* Proposal summary */}
         <div className="card p-6 mb-6">
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex-1">
+          <div className="flex items-start justify-between gap-4 mb-4">
+            <div className="flex-1 min-w-0">
               <p className="text-xs text-slate-500 uppercase tracking-wide font-semibold mb-1">Proposed Title</p>
               <h2 className="font-serif text-xl text-slate-900">{report.input_title}</h2>
             </div>
@@ -90,17 +87,18 @@ export default async function ReportPage({ params }) {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-6">
-          {/* Left column */}
-          <div className="col-span-2 space-y-6">
-            {/* AI Advisory */}
+        {/* Main grid — stacks on mobile */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+          {/* AI Advisory — full width on mobile, 2 cols on desktop */}
+          <div className="md:col-span-2 space-y-6">
             {advisory && (
               <div className={`rounded-xl border p-6 ${riskConfig.bg} ${riskConfig.border}`}>
                 <div className="flex items-center gap-2 mb-4">
                   <span className="text-lg">◈</span>
                   <h3 className="font-serif text-lg text-slate-900">AI Advisory</h3>
                   <span className={`badge ${riskConfig.badge} text-xs ml-auto`}>
-                    gemini-2.5-flash
+                    gemini-2.0-flash
                   </span>
                 </div>
 
@@ -161,7 +159,7 @@ export default async function ReportPage({ params }) {
             )}
           </div>
 
-          {/* Right column — matched abstracts */}
+          {/* Top Matches — below advisory on mobile, right col on desktop */}
           <div className="space-y-4">
             <h3 className="font-serif text-base text-slate-800">Top Matches</h3>
             {matches.length === 0 ? (

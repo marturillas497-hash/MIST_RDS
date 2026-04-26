@@ -2,7 +2,7 @@ import Link from "next/link";
 import { requireStudent } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { StudentSidebar } from "@/components/shared/Sidebar";
-import { PageShell, PageHeader } from "@/components/shared/PageShell";
+import { PageShell } from "@/components/shared/PageShell";
 import { RiskBadge } from "@/components/ui/RiskBadge";
 import { StatCard } from "@/components/ui/StatCard";
 
@@ -41,95 +41,93 @@ export default async function DashboardPage() {
   const adviserName = meta?.profiles?.full_name || null;
 
   return (
-    <div style={{ display: "flex" }}>
+    <div className="flex">
       <StudentSidebar profile={profile} />
-      <div style={{ marginLeft: "16rem", minHeight: "100vh", flex: 1 }}>
-        <main style={{ maxWidth: "64rem", margin: "0 auto", padding: "2.5rem 2rem" }}>
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "2rem" }}>
-            <div>
-              <h1 style={{ fontFamily: "DM Serif Display, Georgia, serif", fontSize: "1.5rem", color: "#0f172a", letterSpacing: "-0.02em" }}>
-                Hello, {profile.full_name.split(" ")[0]}
-              </h1>
-              <p style={{ fontSize: "0.875rem", color: "#64748b", marginTop: "0.25rem" }}>
-                Here is your research activity overview.
-              </p>
-            </div>
-            {scansRemaining > 0 ? (
-              <Link href="/submit" className="btn-primary">
-                + New Scan
-              </Link>
-            ) : (
-              <span style={{
-                fontSize: "0.75rem", color: "#64748b",
-                backgroundColor: "#f1f5f9", padding: "0.625rem 1rem", borderRadius: "0.5rem",
-              }}>
-                Scan limit reached for today
-              </span>
-            )}
-          </div>
-
-          {/* Stats */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem", marginBottom: "2rem" }}>
-            <StatCard label="Total Reports" value={reports?.length || 0} icon="◫" />
-            <StatCard label="Scans Remaining Today" value={scansRemaining} icon="⊕" sub="Resets at 12:00 AM PHT" />
-            <StatCard
-              label="Assigned Adviser"
-              value={adviserName ? adviserName.split(" ").slice(-1)[0] : "None"}
-              icon="◎"
-              sub={adviserName || "Not yet assigned"}
-            />
-          </div>
-
-          {/* Recent reports */}
+      <PageShell>
+        {/* Header */}
+        <div className="flex items-start justify-between mb-6">
           <div>
-            <h2 style={{ fontFamily: "DM Serif Display, Georgia, serif", fontSize: "1.125rem", color: "#1e293b", marginBottom: "1rem" }}>
-              Recent Similarity Reports
-            </h2>
-
-            {!reports || reports.length === 0 ? (
-              <div className="card" style={{ padding: "3rem", textAlign: "center" }}>
-                <p style={{ fontSize: "1.875rem", marginBottom: "0.75rem", opacity: 0.3 }}>◫</p>
-                <p style={{ color: "#64748b", fontSize: "0.875rem", marginBottom: "1rem" }}>
-                  You have not run any similarity scans yet.
-                </p>
-                <Link href="/submit" className="btn-secondary">
-                  Run your first scan
-                </Link>
-              </div>
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                {reports.map((report) => (
-                  <Link
-                    key={report.id}
-                    href={`/dashboard/report/${report.id}`}
-                    className="card-hover"
-                    style={{ padding: "1.25rem", display: "flex", alignItems: "center", justifyContent: "space-between" }}
-                  >
-                    <div style={{ flex: 1, minWidth: 0, paddingRight: "1rem" }}>
-                      <p style={{ fontSize: "0.875rem", fontWeight: "500", color: "#0f172a", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {report.input_title}
-                      </p>
-                      <p style={{ fontSize: "0.75rem", color: "#94a3b8", marginTop: "0.25rem" }}>
-                        {new Date(report.created_at).toLocaleDateString("en-PH", {
-                          year: "numeric", month: "short", day: "numeric",
-                          hour: "2-digit", minute: "2-digit",
-                        })}
-                      </p>
-                    </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexShrink: 0 }}>
-                      <span style={{ fontSize: "0.875rem", fontWeight: "700", color: "#334155" }}>
-                        {Math.round(report.similarity_score * 100)}%
-                      </span>
-                      <RiskBadge level={report.risk_level} />
-                      <span style={{ color: "#cbd5e1" }}>→</span>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
+            <h1 className="page-title">
+              Hello, {profile.full_name.split(" ")[0]}
+            </h1>
+            <p className="page-subtitle">Here is your research activity overview.</p>
           </div>
-        </main>
-      </div>
+          {scansRemaining > 0 ? (
+            <Link href="/submit" className="btn-primary text-sm">
+              + New Scan
+            </Link>
+          ) : (
+            <span className="text-xs text-slate-500 bg-slate-100 px-3 py-2 rounded-lg">
+              Scan limit reached
+            </span>
+          )}
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+          <StatCard label="Total Reports" value={reports?.length || 0} icon="◫" />
+          <StatCard
+            label="Scans Remaining Today"
+            value={scansRemaining}
+            icon="⊕"
+            sub="Resets at 12:00 AM PHT"
+          />
+          <StatCard
+            label="Assigned Adviser"
+            value={adviserName ? adviserName.split(" ").slice(-1)[0] : "None"}
+            icon="◎"
+            sub={adviserName || "Not yet assigned"}
+          />
+        </div>
+
+        {/* Recent reports */}
+        <div>
+          <h2 className="font-serif text-lg text-slate-800 mb-4">
+            Recent Similarity Reports
+          </h2>
+
+          {!reports || reports.length === 0 ? (
+            <div className="card p-10 text-center">
+              <p className="text-3xl mb-3 opacity-30">◫</p>
+              <p className="text-slate-500 text-sm mb-4">
+                You have not run any similarity scans yet.
+              </p>
+              <Link href="/submit" className="btn-secondary">
+                Run your first scan
+              </Link>
+            </div>
+          ) : (
+            <div className="card divide-y divide-slate-100">
+              {reports.map((report) => (
+                <Link
+                  key={report.id}
+                  href={`/dashboard/report/${report.id}`}
+                  className="flex items-center justify-between px-4 py-4 hover:bg-slate-50 transition-colors group"
+                >
+                  <div className="flex-1 min-w-0 pr-3">
+                    <p className="text-sm font-medium text-slate-800 truncate group-hover:text-navy-600 transition-colors">
+                      {report.input_title}
+                    </p>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      {new Date(report.created_at).toLocaleDateString("en-PH", {
+                        year: "numeric", month: "short", day: "numeric",
+                        hour: "2-digit", minute: "2-digit",
+                      })}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <span className="text-sm font-bold text-slate-600">
+                      {Math.round(report.similarity_score * 100)}%
+                    </span>
+                    <RiskBadge level={report.risk_level} />
+                    <span className="text-slate-300 group-hover:text-navy-400 transition-colors text-xs">→</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      </PageShell>
     </div>
   );
 }

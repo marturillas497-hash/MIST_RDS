@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { AdminSidebar } from "@/components/shared/Sidebar";
@@ -55,6 +56,10 @@ export default function ApprovalsPage() {
     <div className="flex">
       <AdminSidebar profile={profile || {}} />
       <PageShell>
+        <Link href="/admin" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 transition-colors mb-4">
+          ← Back to dashboard
+        </Link>
+
         <PageHeader
           title="Faculty Applications"
           subtitle="Review and approve or reject pending research adviser accounts."
@@ -80,7 +85,10 @@ export default function ApprovalsPage() {
         ) : (
           <div className="space-y-3">
             {pending.map((adviser) => (
-              <div key={adviser.id} className="card p-5 flex items-center justify-between gap-4">
+              <div
+                key={adviser.id}
+                className="card p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+              >
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-full bg-navy-100 flex items-center justify-center flex-shrink-0">
                     <span className="text-navy-600 text-sm font-bold">
@@ -107,18 +115,18 @@ export default function ApprovalsPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 flex-shrink-0">
+                <div className="flex items-center gap-2 sm:flex-shrink-0">
                   <button
                     onClick={() => handleAction(adviser.id, "reject")}
                     disabled={acting === adviser.id}
-                    className="btn-ghost text-red-600 hover:bg-red-50 border border-red-200"
+                    className="btn-ghost flex-1 sm:flex-none text-red-600 hover:bg-red-50 border border-red-200"
                   >
                     Reject
                   </button>
                   <button
                     onClick={() => handleAction(adviser.id, "approve")}
                     disabled={acting === adviser.id}
-                    className="btn-secondary"
+                    className="btn-secondary flex-1 sm:flex-none"
                   >
                     {acting === adviser.id ? "Processing..." : "Approve"}
                   </button>

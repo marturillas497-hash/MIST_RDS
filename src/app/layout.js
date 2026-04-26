@@ -21,7 +21,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${dmSans.variable} ${dmSerif.variable}`}>
+    <html lang="en" className={`${dmSans.variable} ${dmSerif.variable}`} data-scroll-behavior="smooth">
       <body className="font-sans bg-slate-50 text-slate-900 antialiased">
         {children}
       </body>

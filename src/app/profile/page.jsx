@@ -118,9 +118,9 @@ export default function ProfilePage() {
                 { label: "Role", value: "Student" },
                 { label: "Status", value: profile.status },
               ].map(({ label, value }) => (
-                <div key={label} className="flex items-center justify-between">
-                  <dt className="text-xs text-slate-500 font-medium">{label}</dt>
-                  <dd className="text-sm text-slate-800 font-medium capitalize">{value}</dd>
+                <div key={label} className="flex items-start justify-between gap-4">
+                  <dt className="text-xs text-slate-500 font-medium flex-shrink-0">{label}</dt>
+                  <dd className="text-sm text-slate-800 font-medium capitalize text-right">{value}</dd>
                 </div>
               ))}
             </dl>
@@ -143,7 +143,7 @@ export default function ProfilePage() {
                   onChange={(e) => update("id_number", e.target.value)}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="label">Year Level</label>
                   <select
@@ -199,7 +199,7 @@ export default function ProfilePage() {
             )}
 
             <div className="mt-6 flex justify-end">
-              <button type="submit" disabled={saving} className="btn-secondary">
+              <button type="submit" disabled={saving} className="btn-secondary w-full sm:w-auto">
                 {saving ? "Saving..." : "Save changes"}
               </button>
             </div>

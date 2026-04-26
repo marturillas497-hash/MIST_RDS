@@ -17,7 +17,7 @@ export default function AdviserClient({ students }) {
       <div className="mb-4">
         <input
           type="text"
-          className="input max-w-sm"
+          className="input w-full sm:max-w-sm"
           placeholder="Search student by name..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -35,15 +35,15 @@ export default function AdviserClient({ students }) {
         <div className="space-y-3">
           {filtered.map((student) => (
             <div key={student.profile_id} className="card p-5">
-              <div className="flex items-start justify-between">
-                <div>
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
                   <Link
                     href={`/adviser/students/${student.profile_id}`}
                     className="text-sm font-semibold text-slate-900 hover:text-navy-600 transition-colors"
                   >
                     {student.full_name}
                   </Link>
-                  <div className="flex items-center gap-3 mt-1">
+                  <div className="flex flex-wrap items-center gap-2 mt-1">
                     {student.department && (
                       <span className="badge bg-navy-100 text-navy-700 text-[10px] uppercase">
                         {student.department.code}
@@ -61,7 +61,7 @@ export default function AdviserClient({ students }) {
                 </div>
                 <Link
                   href={`/adviser/students/${student.profile_id}`}
-                  className="text-xs text-slate-500 bg-slate-100 hover:bg-navy-50 hover:text-navy-600 transition-colors px-3 py-1 rounded-full"
+                  className="text-xs text-slate-500 bg-slate-100 hover:bg-navy-50 hover:text-navy-600 transition-colors px-3 py-1 rounded-full flex-shrink-0"
                 >
                   {student.report_count} report{student.report_count !== 1 ? "s" : ""}
                 </Link>
@@ -74,9 +74,9 @@ export default function AdviserClient({ students }) {
                   </p>
                   <Link
                     href={`/dashboard/report/${student.latest_report.id}`}
-                    className="flex items-center justify-between group"
+                    className="flex items-center justify-between gap-2 group"
                   >
-                    <p className="text-xs text-slate-700 group-hover:text-navy-600 transition-colors line-clamp-1 flex-1 mr-3">
+                    <p className="text-xs text-slate-700 group-hover:text-navy-600 transition-colors line-clamp-1 flex-1 min-w-0">
                       {student.latest_report.input_title}
                     </p>
                     <div className="flex items-center gap-2 flex-shrink-0">

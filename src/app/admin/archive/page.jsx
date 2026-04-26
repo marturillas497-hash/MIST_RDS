@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -116,10 +117,10 @@ export default function ArchivePage() {
         });
         loadPrevAccession(form.department_id);
       }
-      } catch (err) {
-        console.error("Archive error:", err);
-        setError(err.message || "Something went wrong. Please try again.");
-      } finally {
+    } catch (err) {
+      console.error("Archive error:", err);
+      setError(err.message || "Something went wrong. Please try again.");
+    } finally {
       setLoading(false);
     }
   }
@@ -128,6 +129,10 @@ export default function ArchivePage() {
     <div className="flex">
       <AdminSidebar profile={profile || {}} />
       <PageShell>
+        <Link href="/admin" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 transition-colors mb-4">
+          ← Back to dashboard
+        </Link>
+
         <PageHeader
           title="Add to Archive"
           subtitle="Add a new research abstract to the institutional library."
@@ -151,7 +156,7 @@ export default function ArchivePage() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="label">
                     Department <span className="text-red-500">*</span>
@@ -193,7 +198,7 @@ export default function ArchivePage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="label">
                     Authors <span className="text-red-500">*</span>
@@ -264,11 +269,11 @@ export default function ArchivePage() {
               </div>
             )}
 
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <p className="text-xs text-slate-400">
                 A 384-dimension embedding will be generated in your browser before saving.
               </p>
-              <button type="submit" disabled={loading} className="btn-primary">
+              <button type="submit" disabled={loading} className="btn-primary w-full sm:w-auto">
                 {loading ? "Adding..." : "Add to Archive"}
               </button>
             </div>

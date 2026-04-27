@@ -7,6 +7,10 @@ import { generateEmbedding } from "@/lib/embeddings";
 
 const supabase = createClient();
 
+function wordCount(str) {
+  return str.trim().split(/\s+/).filter(Boolean).length;
+}
+
 function AbstractCard({ abstract, departments, onClick }) {
   const dept = departments.find((d) => d.id === abstract.department_id);
   return (
@@ -204,7 +208,7 @@ export function LibraryClient({ isAdmin, profile, departments }) {
         return;
       }
 
-      if (q.trim().length <= 3) {
+      if (wordCount(q) <= 2) {
         const lower = q.toLowerCase();
         setFiltered(
           pool.filter(
@@ -218,15 +222,19 @@ export function LibraryClient({ isAdmin, profile, departments }) {
         setSearching(true);
         try {
           const embedding = await generateEmbedding(q);
-          const { data: matches, error: rpcError } = await supabase.rpc("match_abstracts", {
-            query_embedding: embedding,
-            match_threshold: 0.0,
-            match_count: 20,
+
+          const res = await fetch("/api/library/search", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              embedding,
+              match_threshold: 0.2,
+              match_count: 20,
+            }),
           });
 
-          if (rpcError) console.error("RPC error:", rpcError.message);
-
-          let results = matches || [];
+          const data = await res.json();
+          let results = data.matches || [];
           if (dept) results = results.filter((a) => a.department_id === dept);
           setFiltered(results);
         } catch (err) {
@@ -246,7 +254,7 @@ export function LibraryClient({ isAdmin, profile, departments }) {
   }
 
   useEffect(() => {
-    if (query.trim().length <= 3) {
+    if (wordCount(query) <= 2) {
       runSearch(query, deptFilter);
     }
   }, [query, deptFilter]);
@@ -273,7 +281,6 @@ export function LibraryClient({ isAdmin, profile, departments }) {
 
   return (
     <>
-      {/* Search bar — stacks on mobile */}
       <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-2 mb-6">
         <input
           type="text"
@@ -303,7 +310,7 @@ export function LibraryClient({ isAdmin, profile, departments }) {
         <p className="text-xs text-slate-500">
           {searching ? "Running semantic search..." : `${filtered.length} result${filtered.length !== 1 ? "s" : ""}`}
         </p>
-        {query.trim().length > 3 && !searching && (
+        {wordCount(query) > 2 && !searching && (
           <span className="text-[10px] bg-navy-50 text-navy-600 px-2 py-0.5 rounded-full border border-navy-100">
             Semantic search active
           </span>

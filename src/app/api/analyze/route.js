@@ -4,19 +4,26 @@ import { generateAdvisory } from "@/lib/gemini";
 import { getRiskLevel } from "@/lib/constants";
 import { NextResponse } from "next/server";
 
+function cosineSimilarity(a, b) {
+  let dot = 0, normA = 0, normB = 0;
+  for (let i = 0; i < a.length; i++) {
+    dot += a[i] * b[i];
+    normA += a[i] * a[i];
+    normB += b[i] * b[i];
+  }
+  return dot / (Math.sqrt(normA) * Math.sqrt(normB));
+}
+
 export async function POST(request) {
   try {
     const supabase = await createClient();
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
     }
 
-    // Fetch student profile
     const { data: profile } = await supabase
       .from("profiles")
       .select("*, departments(code), student_metadata!student_metadata_profile_id_fkey(adviser_id)")
@@ -61,37 +68,42 @@ export async function POST(request) {
       );
     }
 
-    // Run semantic similarity via pgvector RPC
+    // Fetch all abstracts and compute similarity in JS
     const adminClient = createAdminClient();
-    const { data: matches, error: rpcError } = await adminClient.rpc(
-      "match_abstracts",
-      {
-        query_embedding: embedding,
-        match_threshold: 0.0,
-        match_count: 5,
-      }
-    );
+    const { data: abstracts, error: fetchError } = await adminClient
+      .from("abstracts")
+      .select("id, title, abstract_text, authors, year, department_id, accession_id, embedding");
 
-    // DEBUG — remove before production
-    console.log("RPC result:", JSON.stringify(matches));
-    console.log("RPC error:", rpcError);
-    console.log("Embedding length:", embedding?.length);
-    console.log("Embedding sample:", embedding?.slice(0, 5));
-
-    if (rpcError) {
-      console.error("match_abstracts RPC error:", rpcError);
-      return NextResponse.json(
-        { error: "Similarity search failed." },
-        { status: 500 }
-      );
+    if (fetchError) {
+      console.error("abstracts fetch error:", fetchError);
+      return NextResponse.json({ error: "Similarity search failed." }, { status: 500 });
     }
 
-    const topMatches = matches || [];
+    const scored = abstracts
+      .filter((a) => a.embedding)
+      .map((a) => {
+        const storedEmbedding = typeof a.embedding === "string"
+          ? JSON.parse(a.embedding)
+          : a.embedding;
+        return {
+          id: a.id,
+          title: a.title,
+          abstract_text: a.abstract_text,
+          authors: a.authors,
+          year: a.year,
+          department_id: a.department_id,
+          accession_id: a.accession_id,
+          similarity: cosineSimilarity(embedding, storedEmbedding),
+        };
+      })
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, 5);
+
+    const topMatches = scored;
     const topScore = topMatches.length > 0 ? topMatches[0].similarity : 0;
     const riskLevel = getRiskLevel(topScore);
     const departmentCode = profile.departments?.code || "BSIS";
 
-    // Generate Gemini advisory
     const advisory = await generateAdvisory({
       title,
       description,
@@ -101,7 +113,6 @@ export async function POST(request) {
       studentName: profile.full_name,
     });
 
-    // Fetch department ids for matched abstracts
     const resultsJson = topMatches.map((m) => ({
       id: m.id,
       title: m.title,
@@ -113,7 +124,6 @@ export async function POST(request) {
       similarity: m.similarity,
     }));
 
-    // Save report
     const adviserId =
       profile.student_metadata?.[0]?.adviser_id ||
       profile.student_metadata?.adviser_id ||
@@ -137,10 +147,7 @@ export async function POST(request) {
 
     if (reportError) {
       console.error("Save report error:", reportError);
-      return NextResponse.json(
-        { error: "Failed to save report." },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: "Failed to save report." }, { status: 500 });
     }
 
     return NextResponse.json({
@@ -153,9 +160,6 @@ export async function POST(request) {
     });
   } catch (err) {
     console.error("Analyze error:", err);
-    return NextResponse.json(
-      { error: "Internal server error." },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error." }, { status: 500 });
   }
 }

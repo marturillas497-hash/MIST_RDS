@@ -1,18 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { generateAdvisory } from "@/lib/gemini";
 import { getRiskLevel } from "@/lib/constants";
+import { matchAbstracts } from "@/lib/pgvector";
 import { NextResponse } from "next/server";
-
-function cosineSimilarity(a, b) {
-  let dot = 0, normA = 0, normB = 0;
-  for (let i = 0; i < a.length; i++) {
-    dot += a[i] * b[i];
-    normA += a[i] * a[i];
-    normB += b[i] * b[i];
-  }
-  return dot / (Math.sqrt(normA) * Math.sqrt(normB));
-}
 
 export async function POST(request) {
   try {
@@ -68,38 +58,12 @@ export async function POST(request) {
       );
     }
 
-    // Fetch all abstracts and compute similarity in JS
-    const adminClient = createAdminClient();
-    const { data: abstracts, error: fetchError } = await adminClient
-      .from("abstracts")
-      .select("id, title, abstract_text, authors, year, department_id, accession_id, embedding");
+    const topMatches = await matchAbstracts({
+      embedding,
+      matchThreshold: 0.0,
+      matchCount: 5,
+    });
 
-    if (fetchError) {
-      console.error("abstracts fetch error:", fetchError);
-      return NextResponse.json({ error: "Similarity search failed." }, { status: 500 });
-    }
-
-    const scored = abstracts
-      .filter((a) => a.embedding)
-      .map((a) => {
-        const storedEmbedding = typeof a.embedding === "string"
-          ? JSON.parse(a.embedding)
-          : a.embedding;
-        return {
-          id: a.id,
-          title: a.title,
-          abstract_text: a.abstract_text,
-          authors: a.authors,
-          year: a.year,
-          department_id: a.department_id,
-          accession_id: a.accession_id,
-          similarity: cosineSimilarity(embedding, storedEmbedding),
-        };
-      })
-      .sort((a, b) => b.similarity - a.similarity)
-      .slice(0, 5);
-
-    const topMatches = scored;
     const topScore = topMatches.length > 0 ? topMatches[0].similarity : 0;
     const riskLevel = getRiskLevel(topScore);
     const departmentCode = profile.departments?.code || "BSIS";

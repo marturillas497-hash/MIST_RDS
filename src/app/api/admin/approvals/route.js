@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { NextResponse } from "next/server";
+import { sendAdviserApprovalEmail } from "@/lib/email";
 
 export async function PATCH(request) {
   try {
@@ -38,6 +39,24 @@ export async function PATCH(request) {
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
+    if (action === "approve") {
+      const { data: authUser, error: authError } = await adminClient.auth.admin.getUserById(adviserId);
+      const { data: adviserProfile, error: profileError } = await adminClient
+        .from("profiles")
+        .select("full_name")
+        .eq("id", adviserId)
+        .single();
+
+      if (authError || profileError) {
+        console.error("[approvals] Could not fetch adviser details for email:", authError || profileError);
+      } else {
+        await sendAdviserApprovalEmail({
+          email: authUser.user.email,
+          fullName: adviserProfile.full_name,
+        });
+      }
     }
 
     return NextResponse.json({ success: true, status });

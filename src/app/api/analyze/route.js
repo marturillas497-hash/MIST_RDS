@@ -102,7 +102,7 @@ export async function POST(request) {
         input_description: description,
         similarity_score: topScore,
         risk_level: riskLevel,
-        ai_recommendations: JSON.stringify(advisory),
+        ai_recommendations: advisory,
         results_json: resultsJson,
         status: "pending",
       })

@@ -192,6 +192,7 @@ export function AdminSidebar({ profile }) {
       <NavItem href="/admin/approvals" icon="◈" label="Approvals" />
       <NavItem href="/admin/analytics" icon="◳" label="Analytics" />
       <NavItem href="/library" icon="◫" label="Library" />
+      <NavItem href="/admin/whitelist" icon="◉" label="Whitelist" />
     </Sidebar>
   );
 }

@@ -15,12 +15,14 @@ export default async function AdminPage() {
     { count: abstractCount },
     { count: pendingCount },
     { count: reportCount },
+    { count: whitelistCount },
     { data: recentReports },
   ] = await Promise.all([
     adminClient.from("profiles").select("id", { count: "exact", head: true }).eq("role", "student"),
     adminClient.from("abstracts").select("id", { count: "exact", head: true }),
     adminClient.from("profiles").select("id", { count: "exact", head: true }).eq("role", "research_adviser").eq("status", "pending"),
     adminClient.from("similarity_reports").select("id", { count: "exact", head: true }),
+    adminClient.from("student_whitelist").select("id", { count: "exact", head: true }),
     adminClient
       .from("similarity_reports")
       .select("id, input_title, risk_level, similarity_score, created_at, profiles!similarity_reports_student_id_fkey(full_name)")
@@ -33,6 +35,7 @@ export default async function AdminPage() {
     { href: "/admin/approvals", icon: "◈", label: "Review Applications", desc: `${pendingCount || 0} pending adviser application${pendingCount !== 1 ? "s" : ""}`, highlight: pendingCount > 0 },
     { href: "/admin/analytics", icon: "◳", label: "View Analytics", desc: "Abstract views and trending research" },
     { href: "/library", icon: "◫", label: "Manage Library", desc: "Browse, edit, or delete abstracts" },
+    { href: "/admin/whitelist", icon: "◉", label: "Student Whitelist", desc: `${whitelistCount || 0} ID${whitelistCount !== 1 ? "s" : ""} on record` },
   ];
 
   return (

@@ -49,6 +49,41 @@ export async function POST(request) {
       return NextResponse.json({ error: "Admin client failed: " + clientErr.message }, { status: 500 });
     }
 
+    // Whitelist check — students only, runs before account creation
+    // so no orphaned auth records are left if the ID is rejected
+    if (role === "student") {
+      if (!id_number || !id_number.trim()) {
+        return NextResponse.json(
+          { error: "Student ID is required." },
+          { status: 400 }
+        );
+      }
+
+      const { data: whitelisted, error: whitelistError } = await supabase
+        .from("student_whitelist")
+        .select("id_number")
+        .eq("id_number", id_number.trim())
+        .maybeSingle();
+
+      if (whitelistError) {
+        console.error("Whitelist lookup error:", whitelistError);
+        return NextResponse.json(
+          { error: "An error occurred while validating your Student ID. Please try again." },
+          { status: 500 }
+        );
+      }
+
+      if (!whitelisted) {
+        console.log("Whitelist rejection for ID:", id_number.trim());
+        return NextResponse.json(
+          { error: "Your Student ID was not found in our records. Please go to the library for inquiries." },
+          { status: 403 }
+        );
+      }
+
+      console.log("Whitelist check passed for ID:", id_number.trim());
+    }
+
     const { data: authData, error: authError } =
       await supabase.auth.admin.createUser({
         email,

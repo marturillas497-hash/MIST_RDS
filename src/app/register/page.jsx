@@ -217,7 +217,7 @@ export default function RegisterPage() {
                   <input
                     type="email"
                     className="input"
-                    placeholder="you@mist.edu.ph"
+                    placeholder="you@gmail.com"
                     autoComplete="email"
                     value={form.email}
                     onChange={(e) => update("email", e.target.value)}

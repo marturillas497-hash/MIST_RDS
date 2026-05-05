@@ -126,9 +126,9 @@ function UploadSection({ onUploadSuccess }) {
         <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1.5">
           Expected format
         </p>
-        <pre className="text-xs text-slate-700 font-mono leading-relaxed">{`id_number\n2316075\n2316076\n2316077`}</pre>
+        <pre className="text-xs text-slate-700 font-mono leading-relaxed">{`id_number,full_name\n2316075,Juan Dela Cruz\n2316076,Maria Santos\n2316077,Pedro Reyes`}</pre>
         <p className="text-xs text-slate-400 mt-2">
-          Header row is optional. One ID per line. Duplicates are ignored.
+          Header row is optional. Name column is optional. Duplicate IDs will be updated.
         </p>
       </div>
 
@@ -238,8 +238,8 @@ function WhitelistTable({ refreshTrigger }) {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search by ID..."
-          className="w-full sm:w-52 px-3 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#003366]/20 focus:border-[#003366]"
+          placeholder="Search by ID or name..."
+          className="w-full sm:w-56 px-3 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#003366]/20 focus:border-[#003366]"
         />
       </div>
 
@@ -250,6 +250,7 @@ function WhitelistTable({ refreshTrigger }) {
             <tr className="bg-slate-50 border-b border-slate-100">
               <th className="text-left px-4 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wide w-10">#</th>
               <th className="text-left px-4 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wide">Student ID</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wide">Full Name</th>
               <th className="text-left px-4 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wide">Date Added</th>
             </tr>
           </thead>
@@ -259,16 +260,17 @@ function WhitelistTable({ refreshTrigger }) {
                 <tr key={i} className="border-b border-slate-50 last:border-0">
                   <td className="px-4 py-3"><div className="h-3 w-5 bg-slate-100 rounded animate-pulse" /></td>
                   <td className="px-4 py-3"><div className="h-3 w-20 bg-slate-100 rounded animate-pulse" /></td>
+                  <td className="px-4 py-3"><div className="h-3 w-32 bg-slate-100 rounded animate-pulse" /></td>
                   <td className="px-4 py-3"><div className="h-3 w-24 bg-slate-100 rounded animate-pulse" /></td>
                 </tr>
               ))
             ) : error ? (
               <tr>
-                <td colSpan={3} className="px-4 py-8 text-center text-sm text-red-500">{error}</td>
+                <td colSpan={4} className="px-4 py-8 text-center text-sm text-red-500">{error}</td>
               </tr>
             ) : rows.length === 0 ? (
               <tr>
-                <td colSpan={3} className="px-4 py-10 text-center text-sm text-slate-400">
+                <td colSpan={4} className="px-4 py-10 text-center text-sm text-slate-400">
                   {debouncedSearch ? `No results for "${debouncedSearch}"` : "No student IDs uploaded yet."}
                 </td>
               </tr>
@@ -277,6 +279,7 @@ function WhitelistTable({ refreshTrigger }) {
                 <tr key={row.id_number} className="border-b border-slate-50 last:border-0 hover:bg-slate-50 transition-colors">
                   <td className="px-4 py-3 text-xs text-slate-400">{(page - 1) * LIMIT + i + 1}</td>
                   <td className="px-4 py-3 font-mono font-semibold text-slate-800">{row.id_number}</td>
+                  <td className="px-4 py-3 text-slate-700">{row.full_name ?? <span className="text-slate-300 italic">not provided</span>}</td>
                   <td className="px-4 py-3 text-slate-500">
                     {new Date(row.created_at).toLocaleDateString("en-PH", {
                       month: "short", day: "numeric", year: "numeric",

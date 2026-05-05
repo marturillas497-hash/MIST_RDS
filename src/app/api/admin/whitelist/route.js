@@ -58,7 +58,7 @@ export async function POST(request) {
     return NextResponse.json({ error: "The CSV file is empty." }, { status: 400 });
   }
 
-  // Skip header row if present
+  // Detect header row
   const firstToken = lines[0].split(",")[0].trim().toLowerCase();
   const isHeader =
     firstToken === "id_number" ||
@@ -80,12 +80,16 @@ export async function POST(request) {
   const invalid = [];
 
   for (const line of dataLines) {
-    const raw = line.split(",")[0].trim();
-    if (!raw) continue;
-    if (/^[a-zA-Z0-9\-]+$/.test(raw)) {
-      rows.push({ id_number: raw });
+    const parts = line.split(",");
+    const id = parts[0].trim();
+    const name = parts[1]?.trim() || null;
+
+    if (!id) continue;
+
+    if (/^[a-zA-Z0-9\-]+$/.test(id)) {
+      rows.push({ id_number: id, full_name: name });
     } else {
-      invalid.push(raw);
+      invalid.push(id);
     }
   }
 
@@ -100,7 +104,7 @@ export async function POST(request) {
 
   const { error: upsertError } = await supabase
     .from("student_whitelist")
-    .upsert(rows, { onConflict: "id_number", ignoreDuplicates: true });
+    .upsert(rows, { onConflict: "id_number", ignoreDuplicates: false });
 
   if (upsertError) {
     console.error("Whitelist upsert error:", upsertError);
@@ -117,7 +121,7 @@ export async function POST(request) {
     submitted: rows.length,
     invalid_count: invalid.length,
     invalid_samples: invalid.slice(0, 5),
-    message: `${rows.length} ID${rows.length !== 1 ? "s" : ""} processed. Duplicates were ignored.`,
+    message: `${rows.length} ID${rows.length !== 1 ? "s" : ""} processed. Duplicates were updated.`,
   });
 }
 
@@ -140,12 +144,12 @@ export async function GET(request) {
 
   let query = supabase
     .from("student_whitelist")
-    .select("id_number, created_at", { count: "exact" })
+    .select("id_number, full_name, created_at", { count: "exact" })
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
 
   if (search) {
-    query = query.ilike("id_number", `%${search}%`);
+    query = query.or(`id_number.ilike.%${search}%,full_name.ilike.%${search}%`);
   }
 
   const { data, error, count } = await query;

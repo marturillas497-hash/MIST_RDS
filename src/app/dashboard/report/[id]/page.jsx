@@ -116,7 +116,7 @@ export default async function ReportPage({ params }) {
                   <span className="text-lg">◈</span>
                   <h3 className="font-serif text-lg text-slate-900">AI Advisory</h3>
                   <span className={`badge ${riskConfig.badge} text-xs ml-auto`}>
-                    gemini-2.0-flash
+                    gemini-2.5-flash
                   </span>
                 </div>
 

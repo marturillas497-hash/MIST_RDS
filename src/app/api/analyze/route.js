@@ -20,9 +20,11 @@ export async function POST(request) {
       .eq("id", user.id)
       .single();
 
-    if (!profile || profile.role !== "student") {
+    if (!profile || (profile.role !== "student" && profile.role !== "research_adviser")) {
       return NextResponse.json({ error: "Forbidden." }, { status: 403 });
     }
+
+    const isAdviser = profile.role === "research_adviser";
 
     /* DEV: Daily scan limit disabled for testing — re-enable before production
     const phtOffset = 8 * 60 * 60 * 1000;
@@ -31,13 +33,20 @@ export async function POST(request) {
     dayStartPHT.setUTCHours(0, 0, 0, 0);
     const dayStartUTC = new Date(dayStartPHT.getTime() - phtOffset);
 
-    const { count } = await supabase
+    const scanQuery = supabase
       .from("similarity_reports")
       .select("id", { count: "exact", head: true })
-      .eq("student_id", user.id)
       .gte("created_at", dayStartUTC.toISOString());
 
-    if (count >= 3) {
+    if (isAdviser) {
+      scanQuery.eq("adviser_id", user.id).is("student_id", null);
+    } else {
+      scanQuery.eq("student_id", user.id);
+    }
+
+    const { count } = await scanQuery;
+
+    if (count >= 5) {
       return NextResponse.json(
         {
           error: "You have reached your daily scan limit. Your scans will reset tomorrow.",
@@ -88,24 +97,31 @@ export async function POST(request) {
       similarity: m.similarity,
     }));
 
-    const adviserId =
-      profile.student_metadata?.[0]?.adviser_id ||
-      profile.student_metadata?.adviser_id ||
-      null;
+    const insertPayload = {
+      input_title: title,
+      input_description: description,
+      similarity_score: topScore,
+      risk_level: riskLevel,
+      ai_recommendations: advisory,
+      results_json: resultsJson,
+      status: "pending",
+    };
+
+    if (isAdviser) {
+      insertPayload.student_id = null;
+      insertPayload.adviser_id = user.id;
+    } else {
+      const adviserId =
+        profile.student_metadata?.[0]?.adviser_id ||
+        profile.student_metadata?.adviser_id ||
+        null;
+      insertPayload.student_id = user.id;
+      insertPayload.adviser_id = adviserId;
+    }
 
     const { data: report, error: reportError } = await supabase
       .from("similarity_reports")
-      .insert({
-        student_id: user.id,
-        adviser_id: adviserId,
-        input_title: title,
-        input_description: description,
-        similarity_score: topScore,
-        risk_level: riskLevel,
-        ai_recommendations: advisory,
-        results_json: resultsJson,
-        status: "pending",
-      })
+      .insert(insertPayload)
       .select()
       .single();
 

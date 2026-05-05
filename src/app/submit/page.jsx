@@ -1,7 +1,7 @@
-import { requireStudent } from "@/lib/auth";
+import { requireStudentOrAdviser } from "@/lib/auth";
 import SubmitClient from "./SubmitClient";
 
 export default async function SubmitPage() {
-  const profile = await requireStudent();
+  const profile = await requireStudentOrAdviser();
   return <SubmitClient profile={profile} />;
 }

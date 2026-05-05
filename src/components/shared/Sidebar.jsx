@@ -178,6 +178,7 @@ export function AdviserSidebar({ profile }) {
   return (
     <Sidebar profile={profile} onSignOut={handleSignOut}>
       <NavItem href="/adviser" icon="⬚" label="Dashboard" exact />
+      <NavItem href="/submit" icon="⊕" label="New Scan" />
       <NavItem href="/library" icon="◫" label="Research Library" />
     </Sidebar>
   );

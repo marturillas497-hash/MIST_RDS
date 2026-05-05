@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { StudentSidebar } from "@/components/shared/Sidebar";
+import { StudentSidebar, AdviserSidebar } from "@/components/shared/Sidebar";
 import { PageShell, PageHeader } from "@/components/shared/PageShell";
 import { generateEmbedding } from "@/lib/embeddings";
 
@@ -23,6 +23,9 @@ export default function SubmitPage({ profile }) {
 
   const isLoading = step !== "idle";
   const currentStep = STEPS.find((s) => s.key === step);
+
+  const SidebarComponent =
+    profile?.role === "research_adviser" ? AdviserSidebar : StudentSidebar;
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -72,7 +75,7 @@ export default function SubmitPage({ profile }) {
 
   return (
     <div className="flex">
-      <StudentSidebar profile={profile || {}} />
+      <SidebarComponent profile={profile || {}} />
       <PageShell>
         <PageHeader
           title="New Similarity Scan"
@@ -126,7 +129,6 @@ export default function SubmitPage({ profile }) {
               </div>
             )}
 
-            {/* Loading state */}
             {isLoading && (
               <div className="card p-6">
                 <div className="flex items-center gap-4">
@@ -141,7 +143,6 @@ export default function SubmitPage({ profile }) {
                   </div>
                 </div>
 
-                {/* Progress steps */}
                 <div className="mt-5 space-y-2">
                   {STEPS.filter((s) => s.key !== "idle").map((s) => {
                     const stepIndex = STEPS.findIndex((x) => x.key === s.key);

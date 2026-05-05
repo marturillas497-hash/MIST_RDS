@@ -81,13 +81,13 @@ export async function middleware(request) {
     return NextResponse.redirect(new URL(getRoleHome(profile.role), request.url));
   }
 
-  // /dashboard/report/[id] is accessible to all roles
-  // the rest of /dashboard, /submit, and /profile are student-only
+  /* /dashboard/report/[id] is accessible to all roles
+   /submit is accessible to students and advisers (enforced in page via requireStudentOrAdviser)
+   the rest of /dashboard and /profile are student-only */
   const isReportPage = pathname.startsWith("/dashboard/report");
   if (
     !isReportPage &&
     (pathname.startsWith("/dashboard") ||
-      pathname.startsWith("/submit") ||
       pathname.startsWith("/profile")) &&
     profile.role !== "student"
   ) {

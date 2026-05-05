@@ -17,7 +17,11 @@ export default async function ReportPage({ params }) {
   const adminClient = createAdminClient();
   const { data: report } = await adminClient
     .from("similarity_reports")
-    .select("*, profiles!similarity_reports_student_id_fkey(full_name, departments(name, code))")
+    .select(`
+      *,
+      profiles!similarity_reports_student_id_fkey(full_name, departments(name, code)),
+      adviser:profiles!similarity_reports_adviser_id_fkey(full_name)
+    `)
     .eq("id", id)
     .single();
 
@@ -39,6 +43,12 @@ export default async function ReportPage({ params }) {
 
   const matches = report.results_json || [];
   const riskConfig = RISK_CONFIG[report.risk_level] || RISK_CONFIG.GREEN;
+
+  const submittedBy = report.student_id
+    ? report.profiles?.full_name
+    : report.adviser?.full_name;
+
+  const submitterLabel = report.student_id ? "Student" : "Research Adviser";
 
   const SidebarComponent =
     profile.role === "admin"
@@ -75,6 +85,14 @@ export default async function ReportPage({ params }) {
             <div className="flex-1 min-w-0">
               <p className="text-xs text-slate-500 uppercase tracking-wide font-semibold mb-1">Proposed Title</p>
               <h2 className="font-serif text-xl text-slate-900">{report.input_title}</h2>
+              {submittedBy && (
+                <p className="text-xs text-slate-400 mt-1.5">
+                  Submitted by{" "}
+                  <span className="font-medium text-slate-600">{submittedBy}</span>
+                  <span className="ml-1.5 text-slate-300">·</span>
+                  <span className="ml-1.5">{submitterLabel}</span>
+                </p>
+              )}
             </div>
             <RiskBadge level={report.risk_level} size="md" />
           </div>

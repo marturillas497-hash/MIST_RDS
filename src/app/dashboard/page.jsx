@@ -15,7 +15,7 @@ export default async function DashboardPage() {
 
   const { data: reports } = await supabase
     .from("similarity_reports")
-    .select("id, input_title, similarity_score, risk_level, created_at, status")
+    .select("id, input_title, similarity_score, risk_level, created_at")
     .eq("student_id", profile.id)
     .order("created_at", { ascending: false });
 
@@ -31,7 +31,7 @@ export default async function DashboardPage() {
     .eq("student_id", profile.id)
     .gte("created_at", dayStartUTC.toISOString());
 
-  const scansRemaining = Math.max(0, 3 - (todayCount || 0));
+  const scansRemaining = Math.max(0, 5 - (todayCount || 0));
 
   const { data: meta } = await supabase
     .from("student_metadata")

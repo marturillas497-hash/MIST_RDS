@@ -104,7 +104,6 @@ export async function POST(request) {
       risk_level: riskLevel,
       ai_recommendations: advisory,
       results_json: resultsJson,
-      status: "pending",
     };
 
     if (isAdviser) {

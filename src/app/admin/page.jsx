@@ -5,6 +5,7 @@ import { AdminSidebar } from "@/components/shared/Sidebar";
 import { PageShell, PageHeader } from "@/components/shared/PageShell";
 import { StatCard } from "@/components/ui/StatCard";
 import { RiskBadge } from "@/components/ui/RiskBadge";
+import { formatPHT } from "@/lib/constants";
 
 export default async function AdminPage() {
   const profile = await requireAdmin();
@@ -105,9 +106,7 @@ export default async function AdminPage() {
                     </p>
                     <p className="text-xs text-slate-400 mt-0.5">
                       {report.profiles?.full_name} &middot;{" "}
-                      {new Date(report.created_at).toLocaleDateString("en-PH", {
-                        month: "short", day: "numeric", year: "numeric",
-                      })}
+                      {formatPHT(report.created_at)}
                     </p>
                   </div>
                   <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">

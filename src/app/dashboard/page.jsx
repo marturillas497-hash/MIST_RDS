@@ -5,6 +5,7 @@ import { StudentSidebar } from "@/components/shared/Sidebar";
 import { PageShell } from "@/components/shared/PageShell";
 import { RiskBadge } from "@/components/ui/RiskBadge";
 import { StatCard } from "@/components/ui/StatCard";
+import { formatPHT } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
@@ -109,10 +110,7 @@ export default async function DashboardPage() {
                       {report.input_title}
                     </p>
                     <p className="text-xs text-slate-400 mt-0.5">
-                      {new Date(report.created_at).toLocaleDateString("en-PH", {
-                        year: "numeric", month: "short", day: "numeric",
-                        hour: "2-digit", minute: "2-digit",
-                      })}
+                      {formatPHT(report.created_at, true)}
                     </p>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">

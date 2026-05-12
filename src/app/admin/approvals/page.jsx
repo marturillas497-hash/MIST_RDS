@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { AdminSidebar } from "@/components/shared/Sidebar";
 import { PageShell, PageHeader } from "@/components/shared/PageShell";
+import { formatPHT } from "@/lib/constants";
 
 export default function ApprovalsPage() {
   const supabase = createClient();
@@ -105,11 +106,7 @@ export default function ApprovalsPage() {
                       )}
                       <span className="text-xs text-slate-400">
                         Applied{" "}
-                        {new Date(adviser.created_at).toLocaleDateString("en-PH", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        })}
+                        {formatPHT(adviser.created_at)}
                       </span>
                     </div>
                   </div>

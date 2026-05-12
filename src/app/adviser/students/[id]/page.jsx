@@ -5,6 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { AdviserSidebar } from "@/components/shared/Sidebar";
 import { PageShell, PageHeader } from "@/components/shared/PageShell";
 import { RiskBadge } from "@/components/ui/RiskBadge";
+import { formatPHT } from "@/lib/constants";
 
 export default async function StudentReportsPage({ params }) {
   const { id } = await params;
@@ -97,13 +98,7 @@ export default async function StudentReportsPage({ params }) {
                     {report.input_title}
                   </p>
                   <p className="text-xs text-slate-400 mt-0.5">
-                    {new Date(report.created_at).toLocaleDateString("en-PH", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
+                    {formatPHT(report.created_at, true)}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { AdminSidebar } from "@/components/shared/Sidebar";
 import { PageShell, PageHeader } from "@/components/shared/PageShell";
+import { formatPHT } from "@/lib/constants";
 
 async function getToken() {
   const supabase = createClient();
@@ -281,9 +282,7 @@ function WhitelistTable({ refreshTrigger }) {
                   <td className="px-4 py-3 font-mono font-semibold text-slate-800">{row.id_number}</td>
                   <td className="px-4 py-3 text-slate-700">{row.full_name ?? <span className="text-slate-300 italic">not provided</span>}</td>
                   <td className="px-4 py-3 text-slate-500">
-                    {new Date(row.created_at).toLocaleDateString("en-PH", {
-                      month: "short", day: "numeric", year: "numeric",
-                    })}
+                    {formatPHT(row.created_at)}
                   </td>
                 </tr>
               ))

@@ -8,6 +8,7 @@ import { AdminSidebar } from "@/components/shared/Sidebar";
 import { PageShell, PageHeader } from "@/components/shared/PageShell";
 import { RiskBadge, RiskBar } from "@/components/ui/RiskBadge";
 import { RISK_CONFIG } from "@/lib/constants";
+import { formatPHT } from "@/lib/constants";
 
 export default async function ReportPage({ params }) {
   const { id } = await params;
@@ -74,9 +75,7 @@ export default async function ReportPage({ params }) {
 
         <PageHeader
           title="Similarity Report"
-          subtitle={`Submitted ${new Date(report.created_at).toLocaleDateString("en-PH", {
-            year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit",
-          })}`}
+          subtitle={`Submitted ${formatPHT(report.created_at, true)}`}
         />
 
         {/* Proposal summary */}

@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { AdminSidebar } from "@/components/shared/Sidebar";
 import { PageShell, PageHeader } from "@/components/shared/PageShell";
+import { formatPHT } from "@/lib/constants";
 
 export default async function AnalyticsPage() {
   const profile = await requireAdmin();
@@ -219,13 +220,7 @@ export default async function AnalyticsPage() {
                   {recentHistory.map((v, i) => (
                     <tr key={i} className="hover:bg-slate-50 transition-colors">
                       <td className="px-5 py-3 text-xs text-slate-500 whitespace-nowrap">
-                        {new Date(v.viewed_at).toLocaleDateString("en-PH", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
+                        {formatPHT(v.viewed_at, true)}
                       </td>
                       <td className="px-5 py-3 text-xs text-slate-800 font-medium whitespace-nowrap">
                         {v.profiles?.full_name || "—"}

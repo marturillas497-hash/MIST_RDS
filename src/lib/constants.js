@@ -95,4 +95,14 @@ export const DEPARTMENTS = [
   { code: "BS Midwifery", name: "Bachelor of Science in Midwifery" },
 ];
 
+export function formatPHT(dateString, includeTime = false) {
+  return new Date(dateString).toLocaleString("en-PH", {
+    timeZone: "Asia/Manila",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    ...(includeTime && { hour: "2-digit", minute: "2-digit" }),
+  });
+}
+
 export const YEAR_LEVELS = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
